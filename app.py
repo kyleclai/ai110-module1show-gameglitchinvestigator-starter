@@ -30,14 +30,19 @@ def parse_guess(raw: str):
 
 
 def check_guess(guess, secret):
+    assert isinstance(secret, int), "secret must always be an int — never cast to str before passing here"
+    assert isinstance(guess, int), "guess must always be an int — check parse_guess output"
+
     if guess == secret:
         return "Win", "🎉 Correct!"
 
     try:
         if guess > secret:
-            return "Too High", "📈 Go HIGHER!"
+            assert guess > secret  # Too High: hint must say LOWER
+            return "Too High", "📉 Go LOWER!"
         else:
-            return "Too Low", "📉 Go LOWER!"
+            assert guess < secret  # Too Low: hint must say HIGHER
+            return "Too Low", "📈 Go HIGHER!"
     except TypeError:
         g = str(guess)
         if g == secret:
@@ -155,10 +160,8 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
-        if st.session_state.attempts % 2 == 0:
-            secret = str(st.session_state.secret)
-        else:
-            secret = st.session_state.secret
+        secret = st.session_state.secret  # Fix: always use int secret for correct comparison
+        assert isinstance(secret, int), "secret must be int before passing to check_guess"
 
         outcome, message = check_guess(guess_int, secret)
 
