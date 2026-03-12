@@ -4,9 +4,41 @@ Answer each question in 3 to 5 sentences. Be specific and honest about what actu
 
 ## 1. What was broken when you started?
 
-- What did the game look like the first time you ran it?
-- List at least two concrete bugs you noticed at the start  
-  (for example: "the secret number kept changing" or "the hints were backwards").
+When I first ran the app, the hints were immediately misleading and the game felt
+unwinnable no matter what strategy I used. Three concrete bugs stood out:
+
+**Bug 1 — Hints were backwards (Higher/Lower inverted)**
+- **Expected:** When my guess was too high (e.g. I guessed 80 and the secret was 50),
+  the app should tell me to go *lower*.
+- **What actually happened:** The app said "Go HIGHER!" — the opposite of what I needed.
+  Both the label ("Too High") and the emoji icon (📈) pointed in the wrong direction.
+  This made it impossible to narrow down the secret by following the hints.
+- **Root cause:** `check_guess` in `app.py` had `"📈 Go HIGHER!"` on the `guess > secret`
+  branch and `"📉 Go LOWER!"` on the `guess < secret` branch — the messages were swapped.
+
+**Bug 2 — Secret was secretly converted to a string every other attempt**
+- **Expected:** The comparison between my guess and the secret should always be a
+  numeric comparison (e.g. `60 > 50`).
+- **What actually happened:** On every even-numbered attempt, `secret` was cast to a
+  string before being passed to `check_guess`. This caused lexicographic comparisons
+  like `str(9) > str(10)` which evaluates to `True` (because `"9" > "1"`), producing
+  completely wrong and inconsistent hints on alternating turns.
+- **Root cause:** Lines 158-161 of `app.py` had an intentional `if attempts % 2 == 0`
+  branch that called `str(st.session_state.secret)`.
+
+**Bug 3 — Hard difficulty has a narrower range than Normal, and Easy has fewer guesses than Normal**
+- **Expected:** "Hard" should be harder than "Normal" — meaning a wider range of numbers
+  to guess from and fewer attempts. "Easy" should be easier — meaning more attempts to guess.
+- **What actually happened:** `get_range_for_difficulty("Hard")` returned `(1, 50)`,
+  which is actually *easier* to guess within than Normal's `(1, 100)`. Hard had fewer
+  attempts (5 vs 8) but a smaller range — the two settings worked against each other
+  rather than compounding the difficulty. Additionally, Easy only allowed 6 guesses vs
+  Normal's 8, which made Easy *harder* in terms of attempts despite having a smaller number range.
+- **Root cause:** `app.py` line 10 set the Hard range to `1, 50` instead of a wider
+  range, and `attempt_limit_map["Easy"]` was set to `6` instead of a higher value.
+- **Fix:** Changed Hard's range to `(1, 200)` so it is genuinely harder than Normal's
+  `(1, 100)`. Changed Easy's attempt limit to `10` so players have more chances, making
+  Easy actually easier than Normal's 8 attempts.
 
 ---
 
