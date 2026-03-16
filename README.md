@@ -41,7 +41,7 @@ It wrote the code, ran away, and now the game is unplayable.
 
 24 pytest cases covering edge cases across all four functions in `logic_utils.py` — including non-numeric strings, empty input, boundary values, float truncation, negative numbers, difficulty range comparisons, and score scaling. All 24 tests pass.
 
-![Pytest Results](assets/pytest_results.png)
+![Pytest Results](assets/pytest_result.png)
 
 - [ ] [If you choose to complete Challenge 2, documenting experience using Feature Expansion via Agent Mode]
 
