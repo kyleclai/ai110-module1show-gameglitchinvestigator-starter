@@ -15,6 +15,7 @@ unwinnable no matter what strategy I used. Three concrete bugs stood out:
   This made it impossible to narrow down the secret by following the hints.
 - **Root cause:** `check_guess` in `app.py` had `"📈 Go HIGHER!"` on the `guess > secret`
   branch and `"📉 Go LOWER!"` on the `guess < secret` branch — the messages were swapped.
+- **Fix:** Swapped the two return strings so the `guess > secret` branch returns `"📉 Go LOWER!"` and the `guess < secret` branch returns `"📈 Go HIGHER!"`. The fix works because the hint message now matches the actual numeric relationship between guess and secret.
 
 **Bug 2 — Secret was secretly converted to a string every other attempt**
 - **Expected:** The comparison between my guess and the secret should always be a
@@ -25,6 +26,7 @@ unwinnable no matter what strategy I used. Three concrete bugs stood out:
   completely wrong and inconsistent hints on alternating turns.
 - **Root cause:** Lines 158-161 of `app.py` had an intentional `if attempts % 2 == 0`
   branch that called `str(st.session_state.secret)`.
+- **Fix:** Removed the `if attempts % 2 == 0` block entirely and added an `assert isinstance(secret, int)` guard before `check_guess` is called. This ensures the secret is always read as an integer from session state without any conditional type casting, so comparisons are always numeric regardless of attempt number.
 
 **Bug 3 — Hard difficulty has a narrower range than Normal, and Easy has fewer guesses than Normal**
 - **Expected:** "Hard" should be harder than "Normal" — meaning a wider range of numbers

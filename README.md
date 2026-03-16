@@ -34,6 +34,12 @@ It wrote the code, ran away, and now the game is unplayable.
 - [x] Insert a screenshot of your fixed, winning game here
 ![Insert a screenshot of your fixed, winning game here](assets/win_gamescreen.png)
 
+## 🧪 Pytest Results
+
+All 3 tests pass after refactoring logic into `logic_utils.py`:
+
+![Pytest Results](assets/pytest_results.png)
+
 ## 🚀 Stretch Features
 
 - [ ] [If you choose to complete Challenge 4, insert a screenshot of your Enhanced Game UI here]
