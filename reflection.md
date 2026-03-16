@@ -56,25 +56,38 @@ unwinnable no matter what strategy I used. Three concrete bugs stood out:
 ## 2. How did you use AI as a teammate?
 
 - Which AI tools did you use on this project (for example: ChatGPT, Gemini, Copilot)?
+Claude integrated with VSCode.
 - Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
+After playing the game, I noticed the hints logic was backwards. Luckily, upon reviewing the project, Claude also noticed this bug, correctly identified the location of the logic error, and recommended a fix. I verified this fix by creating pytest assertions to ensure the logic works as intended.
 - Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
+Claude suggested to change the Hard mode logic to have a smaller number pool to guess from. This isn't correct as it would make the Hard mode easier to win than the Normal mode (given the number of guesses is constant). However, this suggestion highlighted that I could make the modes more difficult by editing the range of numbers - allowing me to fix the bug manually.
 
 ---
 
 ## 3. Debugging and testing your fixes
 
 - How did you decide whether a bug was really fixed?
-- Describe at least one test you ran (manual or using pytest)  
+After applying each fix, I re-ran the Streamlit app and manually tested the exact scenario that originally exposed the bug. For the inverted hints bug, I deliberately guessed a number I knew was too high and confirmed the app now said "Go LOWER!" instead of "Go HIGHER!". For the string-conversion bug, I submitted several guesses in a row and verified that hints were consistent across both odd and even attempt numbers — no more lexicographic weirdness.
+
+- Describe at least one test you ran (manual or using pytest)
   and what it showed you about your code.
+I wrote three pytest cases in `test_game_logic.py` — `test_winning_guess`, `test_guess_too_high`, and `test_guess_too_low` — which tested that `check_guess` returned the correct outcome for each scenario. Writing the tests revealed a mismatch: my test expected a plain string like `"Too High"`, but the actual implementation returns a tuple `(outcome, message)`. That forced me to decide whether to fix the tests or the function signature, which was a useful discovery I wouldn't have caught from manual testing alone.
+
 - Did AI help you design or understand any tests? How?
+Claude helped me think through what scenarios to cover — for example, asking what happens when guess equals secret exactly (the win case), and whether I needed to test invalid input at the `check_guess` level or only at `parse_guess`. I used those suggestions as a starting checklist, then adjusted based on what the actual function signatures looked like in `app.py`.
 
 ---
 
 ## 4. What did you learn about Streamlit and state?
 
 - In your own words, explain why the secret number kept changing in the original app.
+The secret number kept changing because every time the user interacted with the app — clicking a button or typing in the input — Streamlit re-ran the entire Python script from top to bottom. Without session state, `random.randint(low, high)` would execute on every rerun, generating a brand-new secret each time instead of keeping the original one.
+
 - How would you explain Streamlit "reruns" and session state to a friend who has never used Streamlit?
+Imagine your entire program restarts from line 1 every time a user clicks anything. Session state is like a sticky notepad that survives those restarts — it lets the app remember things like the secret number, the attempt count, and the game status across interactions, so the game doesn't reset itself with every button press. I learned more about how this works by reading the official Streamlit documentation at https://docs.streamlit.io/develop/api-reference/caching-and-state/st.session_state.
+
 - What change did you make that finally gave the game a stable secret number?
+I wrapped the `random.randint(low, high)` call in an `if "secret" not in st.session_state` guard (line 97–98 of `app.py`). The first time the script runs, the secret is generated and stored in `st.session_state.secret`. On every subsequent rerun, the condition is false so the stored value is preserved instead of replaced. Interestingly, I did not actually observe this bug during my initial playthrough — I was manually clearing my browser cache and rerunning the app between test sessions, which wiped session state each time and masked the issue. I only realized the bug existed after reviewing the code more carefully and understanding that a normal player would experience the secret silently changing mid-game without ever seeing an error.
 
 ---
 
@@ -82,5 +95,10 @@ unwinnable no matter what strategy I used. Three concrete bugs stood out:
 
 - What is one habit or strategy from this project that you want to reuse in future labs or projects?
   - This could be a testing habit, a prompting strategy, or a way you used Git.
+One strategy I want to reuse is using Plan Mode in Claude to outline an execution plan before diving into fixes. On this project, `reflection.md` essentially became my living plan — I kept it updated with bugs I found and my current thinking, and Claude could reference the persistent chat context to update the reflection in my own language. This made documentation feel natural rather than like an afterthought. I also want to keep using Git not just for version control, but as a real-time way to observe the project evolving — seeing diffs and commit history helped me stay grounded in what actually changed rather than just trusting what AI described.
+
 - What is one thing you would do differently next time you work with AI on a coding task?
+Next time I would think more broadly beyond logic bugs — I spent most of my time on code-level issues but didn't think much about UI behavior and how a real player would experience the app. I also leaned heavily on AI to surface bugs rather than forming my own hypotheses first from playing the game. Going forward, I want to combine both: play the app like a user, form my own theories, then use AI to help investigate — rather than asking AI what's wrong and just verifying its list.
+
 - In one or two sentences, describe how this project changed the way you think about AI generated code.
+Working with an incomplete and sometimes inaccurate task description made this feel like a real industry project — I couldn't rely on AI to hand me a perfect bug list, and not every hint it gave was right. That experience shifted how I think about AI-generated code: it's a collaborator that requires verification, not a source of truth, and the most important skill is knowing when to trust it and when to push back.
