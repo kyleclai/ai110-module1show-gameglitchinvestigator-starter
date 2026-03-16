@@ -40,6 +40,17 @@ unwinnable no matter what strategy I used. Three concrete bugs stood out:
   `(1, 100)`. Changed Easy's attempt limit to `10` so players have more chances, making
   Easy actually easier than Normal's 8 attempts.
 
+**Bug 4 — UI prompt always showed "1 to 100" regardless of difficulty**
+- **Expected:** The on-screen prompt should tell the player the actual range for the
+  selected difficulty (e.g. "Guess a number between 1 and 200" on Hard).
+- **What actually happened:** The `st.info(...)` message had the range hardcoded as
+  `"between 1 and 100"`, so Easy and Hard players saw the wrong range in the prompt
+  even though the game itself used the correct range internally.
+- **Root cause:** `app.py` used a string literal `"1 and 100"` instead of the `low`
+  and `high` variables that were already computed from `get_range_for_difficulty`.
+- **Fix:** Replaced the hardcoded values with `f"between {low} and {high}"` so the
+  prompt dynamically reflects the actual range for the chosen difficulty.
+
 ---
 
 ## 2. How did you use AI as a teammate?
