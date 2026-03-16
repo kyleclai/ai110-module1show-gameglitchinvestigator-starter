@@ -34,12 +34,21 @@ It wrote the code, ran away, and now the game is unplayable.
 - [x] Insert a screenshot of your fixed, winning game here
 ![Insert a screenshot of your fixed, winning game here](assets/win_gamescreen.png)
 
-## 🧪 Pytest Results
-
-All 3 tests pass after refactoring logic into `logic_utils.py`:
-
-![Pytest Results](assets/pytest_results.png)
 
 ## 🚀 Stretch Features
 
+- [x] [Challenge 1: Advanced Edge-Case Testing]
+
+24 pytest cases covering edge cases across all four functions in `logic_utils.py` — including non-numeric strings, empty input, boundary values, float truncation, negative numbers, difficulty range comparisons, and score scaling. All 24 tests pass.
+
+![Pytest Results](assets/pytest_results.png)
+
+- [ ] [If you choose to complete Challenge 2, documenting experience using Feature Expansion via Agent Mode]
+
+- [x] [Challenge 3: Professional Documentation and Linting]
+
+Used the Generate Documentation smart action to add professional Google-style docstrings to all four functions in `logic_utils.py`, including `Args:`, `Returns:`, and `Examples:` sections. Return type annotations were also added to every function signature. Copilot's Fix feature was then used to review PEP 8 compliance — confirming consistent spacing, snake_case naming, and line lengths under 79 characters throughout.
+
 - [ ] [If you choose to complete Challenge 4, insert a screenshot of your Enhanced Game UI here]
+
+- [ ] [If you choose to complete Challenge 5, write about AI Model Comparison]
