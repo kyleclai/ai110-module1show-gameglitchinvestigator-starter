@@ -112,7 +112,7 @@ if "history" not in st.session_state:
 st.subheader("Make a guess")
 
 st.info(
-    f"Guess a number between 1 and 100. "
+    f"Guess a number between {low} and {high}. "
     f"Attempts left: {attempt_limit - st.session_state.attempts}"
 )
 
@@ -160,7 +160,7 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
-        secret = st.session_state.secret  # Fix: always use int secret for correct comparison
+        secret = st.session_state.secret  # FIX: always use int secret for correct comparison
         assert isinstance(secret, int), "secret must be int before passing to check_guess"
 
         outcome, message = check_guess(guess_int, secret)
